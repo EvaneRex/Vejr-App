@@ -4,6 +4,111 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vejr App</title>
+    <link rel="stylesheet" href="./assets/style.css" />
+    <script src="./assets/main.js" defer></script>
+    <script src="./assets/app.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   </head>
-  <body></body>
+  <body>
+    <div id="onboarding">
+      <div class="skip-bar">
+        <button class="skip-bar-btn skip">Spring over <i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+      <!-- Progressbar (skjules på slide 1) -->
+      <div id="progressBarContainer">
+        <div id="progressBar"></div>
+      </div>
+      <!-- Slide 1 -->
+      <div class="slide active flex-column-center">
+        <h2>Velkommen til ...</h2>
+        <div class="logo">
+          <p>PawCast</p>
+        </div>
+        <p class="introtext">For at give dig det bedste gåtursvejr, vil vi gerne kende dig lidt bedre. Dine oplysninger bliver kun brugt til at gøre appen mere personlig. 🐾</p>
+        <div class="img-wrapper">
+      <img class="vector-img" src="./assets/img/walk_dog.svg" alt="">
+    </div>
+    <button class="next">Kom i gang</button>
+  </div>
+
+  <!-- Slide 2 -->
+  <div class="slide flex-column-center">
+    <h2>Step 1: Personlig info</h2>
+    <div class="input-wrapper">
+      <label for="userName">Navn</label>
+      <input type="text" id="userName" placeholder="Dit navn">
+    </div>
+    <div class="input-wrapper">
+      <label for="userGender">Køn</label>
+      <select id="userGender">
+       <option value="">Vælg køn</option>
+       <option value="mand">Mand</option>
+       <option value="kvinde">Kvinde</option>
+       <option value="andet">Andet</option>
+     </select>
+    </div>
+    <button class="next">Næste</button>
+  </div>
+
+  <!-- Slide 3 -->
+  <div class="slide flex-column-center">
+    <h2>Hvor bor du?</h2>
+    <div class="input-wrapper">
+      <label for="userCity">Favourit by</label>
+      <input type="text" id="userCity" placeholder="By">
+    </div>
+    <p>Vi bruger det kun til at vise vejret dér, hvor du er 🌦️</p>
+    <button id="finish">Gem og fortsæt</button>
+  </div>
+</div>
+
+<!-- Hoved-app -->
+<div id="app" style="display:none;">
+  <!-- <h2>Hej <span id="displayName"></span> 👋</h2> -->
+    <h1>Lokation</h1>
+    <div class="input-wrapper">
+      <label for="userCity"><i class="fa-solid fa-magnifying-glass"></i> Søg efter by</label>
+      <input type="text" id="cityInput" placeholder="Søg by..." autocomplete="off">
+    </div>
+<div id="suggestions" class="suggestions-box"></div>
+    <section id="current">
+      <div class="board-shuffle-wrapper">
+  <a id="geoMode" class="active" href="#"><i class="fa-solid fa-location-arrow"></i></a>
+  <a id="cityMode" href="#"><div class="dot"></div></a>
+</div>
+      <h2 class="text-align" id="city"></h2>
+      <div class="weather--icon-wrapper">
+        <img id="icon" alt="Vejr ikon">
+      </div>
+      <div class="board-shuffle-wrapper">
+      <div class="dataWrapper">
+        <img class="data-image" src="./assets/img/sun.svg" alt="">
+        <p id="temp"></p>
+      </div>
+      <div class="dataWrapper">
+        <img class="data-image" src="./assets/img/sun.svg" alt="">
+        <p id="rain"></p>
+      </div>
+      <div class="dataWrapper" id="wind">
+          <div class="wind-row">
+            <svg id="windArrow" viewBox="0 0 24 24" width="8" height="8" aria-label="Vindretning"><path d="M12 2 L16 10 H13 V22 H11 V10 H8 Z"></path></svg>
+            <span id="windText"></span>
+          </div>
+      </div>
+      </div>
+      <div class="message--center">
+        <div class="message-wrapper">
+          <img class="data-image" src="./assets/img/sun.svg" alt="">
+          <p id="message">Husk Vand</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Prognose for dagen</h2>
+      <div id="forecast"></div>
+    </section>
+</div>
+
+  </body>
 </html>
