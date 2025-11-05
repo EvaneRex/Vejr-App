@@ -200,7 +200,7 @@ function getDogTips(temp, weatherCode, rain = 0, windSpeed = 0) {
 // ------------------------------------------------------
 async function showWeatherData({ lat, lon, city }) {
     let currentUrl, forecastUrl;
-
+    // OpenWeather bruger HTTP-requests med forskellige parametre. Kun GET er understøttet. Serveren svarer med JSON (et objekt med temperatur, vind osv.). Vores JavaScript-kode omdanner svaret med .then(r => r.json()).
     if (city) {
         currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=da`;
         forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric&lang=da`;
