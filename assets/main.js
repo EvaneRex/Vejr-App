@@ -165,6 +165,10 @@ function getDogTips(temp, weatherCode, rain = 0, windSpeed = 0) {
             text: "Pas på salt og is under poterne",
             icon: "./assets/img/dog/PawIce.svg"
         });
+        tips.push({
+            text: "Overvej varmt tøj til hunden",
+            icon: "./assets/img/dog/dogclothes.svg"
+        });
     }
 
     if (rain > 0.5 || weatherCode.startsWith("09") || weatherCode.startsWith("10")) {
@@ -183,8 +187,8 @@ function getDogTips(temp, weatherCode, rain = 0, windSpeed = 0) {
 
     if (tips.length === 0) {
         tips.push({
-            text: "Perfekt gåturvejr",
-            icon: "./assets/img/sun.svg"
+            text: "Perfekt vejr til en gåtur",
+            icon: "./assets/img/dog/walk.svg"
         });
     }
 
