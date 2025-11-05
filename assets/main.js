@@ -7,6 +7,7 @@ const apiKey = "add43568d915b7b4e55a7c1f8b67d198";
 // ------------------------------------------------------
 // Cache DOM-elementer (hurtigere og mere effektivt)
 // ------------------------------------------------------
+// Globale DOM-elementer: Ingen gentagne lookups i hele scriptet
 const cityEl = document.getElementById("city");
 const tempEl = document.getElementById("temp");
 const rainEl = document.getElementById("rain");
@@ -80,21 +81,21 @@ function getClothingSuggestion(temp, weatherCode, rain = 0) {
         mand: {
             raincoat: "./assets/img/clothes/male/raincoat.svg",
             winter: "./assets/img/clothes/male/winter.svg",
-            tshirt: "./assets/img/clothes/male/summer.svg",
+            summer: "./assets/img/clothes/male/summer.svg",
             jacket: "./assets/img/clothes/male/jacket.svg",
             coat: "./assets/img/clothes/male/coat.svg"
         },
         kvinde: {
             raincoat: "./assets/img/clothes/female/raincoat.svg",
             winter: "./assets/img/clothes/female/winter.svg",
-            tshirt: "./assets/img/clothes/female/summer.svg",
+            summer: "./assets/img/clothes/female/summer.svg",
             jacket: "./assets/img/clothes/female/jacket.svg",
             coat: "./assets/img/clothes/female/coat.svg"
         },
         andet: {
             raincoat: "./assets/img/clothes/unisex/raincoat.svg",
             winter: "./assets/img/clothes/unisex/winter.svg",
-            tshirt: "./assets/img/clothes/unisex/summer.svg",
+            summer: "./assets/img/clothes/unisex/summer.svg",
             jacket: "./assets/img/clothes/unisex/jacket.svg",
             coat: "./assets/img/clothes/unisex/coat.svg"
         }
@@ -112,12 +113,12 @@ function getClothingSuggestion(temp, weatherCode, rain = 0) {
     // Sne
     else if (weatherCode.startsWith("13")) {
         icon = iconSet.winter;
-        text = "Det er snevejr – tag varmt tøj";
+        text = "Det er snevejr - tag varmt tøj";
     }
     // Varmt
     else if (temp >= 20) {
-        icon = iconSet.tshirt;
-        text = "T-shirt vejr";
+        icon = iconSet.summer;
+        text = "Sommer vejr";
     }
     // Mildt
     else if (temp >= 10) {
@@ -132,7 +133,7 @@ function getClothingSuggestion(temp, weatherCode, rain = 0) {
     // Frost
     else {
         icon = iconSet.winter;
-        text = "Hue og handsker anbefales";
+        text = "På med handsker og vinterjakke";
     }
 
     return { icon, text };
@@ -161,7 +162,7 @@ function getDogTips(temp, weatherCode, rain = 0, windSpeed = 0) {
 
     if (temp <= 0) {
         tips.push({
-            text: "Koldt! Pas på salt og is under poterne",
+            text: "Pas på salt og is under poterne",
             icon: "./assets/img/dog/PawIce.svg"
         });
     }
@@ -175,7 +176,7 @@ function getDogTips(temp, weatherCode, rain = 0, windSpeed = 0) {
 
     if (weatherCode.startsWith("50")) {
         tips.push({
-            text: "Tåge – hold snoren kort",
+            text: "Tåge - hold snoren kort",
             icon: "./assets/img/fog.svg"
         });
     }
@@ -191,7 +192,7 @@ function getDogTips(temp, weatherCode, rain = 0, windSpeed = 0) {
 }
 
 // ------------------------------------------------------
-// 🌦 Hent og vis vejrdata
+// Hent og vis vejrdata
 // ------------------------------------------------------
 async function showWeatherData({ lat, lon, city }) {
     let currentUrl, forecastUrl;
@@ -205,6 +206,10 @@ async function showWeatherData({ lat, lon, city }) {
     } else return;
 
     try {
+        // async/await + Promise.all: Begge fetches starter samtidigt → browseren åbner to forbindelser med det samme.
+        // De kører parallelt, ikke sekventielt.
+        // Browseren udnytter netværket maksimalt, og CPU’en venter kun én gang på begge resultater.
+        // Ingen kæder af .then() — JS-motoren kan planlægge afviklingen mere direkte.
         const [current, forecast] = await Promise.all([
             fetch(currentUrl).then(r => r.json()),
             fetch(forecastUrl).then(r => r.json())
@@ -212,7 +217,14 @@ async function showWeatherData({ lat, lon, city }) {
 
         // Aktuelt vejr
         cityEl.textContent = `${current.name}, ${current.sys.country}`;
+        const feelsLike = current.main.feels_like.toFixed(1);
         tempEl.textContent = `${current.main.temp.toFixed(1)} °C`;
+
+        // Sæt tooltip på hele temperaturblokken
+        const tempWrapper = tempEl.closest(".dataWrapper");
+        if (tempWrapper) {
+            tempWrapper.setAttribute("title", `Føles som ${feelsLike} °C`);
+        }
         updateWind(current.wind);
         rainEl.textContent = current.rain ? `${current.rain["1h"] || 0} mm` : "0 mm";
         iconEl.src = getCustomIcon(current.weather[0].icon);
@@ -251,6 +263,7 @@ async function showWeatherData({ lat, lon, city }) {
         // Dagens prognose
         const today = new Date().getDate();
         const todayForecast = forecast.list.filter(item =>
+            // Fra Unix-tid til lokal tid (Sekunder siden 1970). Js Date skal bruge millisekunder. Derfor *1000.
             new Date(item.dt * 1000).getDate() === today
         );
 
@@ -260,12 +273,14 @@ async function showWeatherData({ lat, lon, city }) {
             return;
         }
 
+        // DocumentFragment: effektiv opbygning af DOM før indsættelse i én operation uden gentagne renderinger. 
         const forecastFrag = document.createDocumentFragment();
 
         todayForecast.forEach(item => {
             const div = document.createElement("div");
             div.className = "day smallDay";
 
+            // Fra Unix-tid til lokal tid (Sekunder siden 1970). Js Date skal bruge millisekunder. Derfor *1000. Formatér til dansk tid og vis kun timer og minutter.
             const time = new Date(item.dt * 1000).toLocaleTimeString("da-DK", {
                 hour: "2-digit", minute: "2-digit"
             });
@@ -276,31 +291,40 @@ async function showWeatherData({ lat, lon, city }) {
             const windSpeed = item.wind.speed.toFixed(1);
             const windDeg = item.wind.deg;
             const windDir = degToCardinalDa(windDeg);
+            const clothing = getClothingSuggestion(item.main.temp, item.weather[0].icon, rain);
 
             div.innerHTML = `
-        <h3>${time}</h3>
-        <div class="weather-header">
-          <img class="data-image-small" src="${icon}" alt="${desc}">
-          <p>${desc}</p>
+      <h3>${time}</h3>
+
+      <div class="weather-header">
+        <img class="data-image-small" src="${icon}" alt="${desc}">
+        <p>${desc}</p>
+      </div>
+
+      <div class="weather-header clothing-header">
+        <img class="data-image-small" src="${clothing.icon}" alt="Tøjforslag">
+        <p>${clothing.text}</p>
+      </div>
+
+      <div class="data-container">
+        <div class="dataWrapper tempWrapper">
+          <img class="data-image" src="./assets/img/termometer.svg" alt="Temp">
+          <p class="smallData">${temp} °C</p>
         </div>
-        <div class="data-container">
-          <div class="dataWrapper tempWrapper">
-            <img class="data-image" src="./assets/img/termometer.svg" alt="Temp">
-            <p class="smallData">${temp} °C</p>
-          </div>
-          <div class="dataWrapper rainWrapper">
-            <img class="data-image" src="./assets/img/water.svg" alt="Nedbør">
-            <p class="smallData">${rain} mm</p>
-          </div>
-          <div class="dataWrapper windWrapper">
-            <svg class="windArrowSmall" viewBox="0 0 24 24" width="24" height="24"
-                 style="transform: rotate(${windDeg + 180}deg);">
-              <path d="M12 2 L16 10 H13 V22 H11 V10 H8 Z"></path>
-            </svg>
-            <p class="smallData">${windSpeed} m/s ${windDir}</p>
-          </div>
+        <div class="dataWrapper rainWrapper">
+          <img class="data-image" src="./assets/img/water.svg" alt="Nedbør">
+          <p class="smallData">${rain} mm</p>
         </div>
-      `;
+        <div class="dataWrapper windWrapper">
+          <svg class="windArrowSmall" viewBox="0 0 24 24" width="24" height="24"
+               style="transform: rotate(${windDeg + 180}deg);">
+            <path d="M12 2 L16 10 H13 V22 H11 V10 H8 Z"></path>
+          </svg>
+          <p class="smallData">${windSpeed} m/s ${windDir}</p>
+        </div>
+      </div>
+    `;
+
             forecastFrag.appendChild(div);
         });
 
@@ -414,7 +438,7 @@ cityBtn.addEventListener("click", (e) => {
         const query = cityInput.value.trim();
         if (query) {
             showWeatherData({ city: query });
-            cityInput.value = ""; // ryd feltet
+            cityInput.value = "";
         } else {
             alert("Indtast en by for at søge");
         }
@@ -425,7 +449,7 @@ cityInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
         e.preventDefault();
         searchBtn.click();
-        cityInput.value = ""; // ryd også her for en sikkerheds skyld
+        cityInput.value = "";
     }
 });
 
