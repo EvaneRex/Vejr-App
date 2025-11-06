@@ -454,3 +454,18 @@ section {
     }
 
 }
+
+
+
+@media (max-width: 400px) {
+
+    h3 {
+        font-size: 1rem;
+    }
+
+    .day {
+        grid-template-columns: .2fr .75fr 1fr;
+        padding: .5rem;
+    }
+
+}
