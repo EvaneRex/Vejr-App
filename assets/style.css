@@ -468,4 +468,9 @@ section {
         padding: .5rem;
     }
 
+    .board-shuffle-wrapper p,
+    #windText {
+        font-size: 14px;
+    }
+
 }
