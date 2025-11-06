@@ -6,6 +6,7 @@ const apiKey = "add43568d915b7b4e55a7c1f8b67d198";
 
 // ------------------------------------------------------
 // Globale DOM-elementer: Ingen gentagne lookups i hele scriptet
+// ------------------------------------------------------
 const cityEl = document.getElementById("city");
 const tempEl = document.getElementById("temp");
 const rainEl = document.getElementById("rain");
