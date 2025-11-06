@@ -298,7 +298,7 @@ button.skip {
 
 .day {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: .2fr 1fr 1fr;
     align-items: center;
     justify-content: space-between;
     border-radius: 8px;
@@ -440,7 +440,7 @@ section {
 
     .desktopflex {
         display: grid;
-        grid-template-columns: 1.2fr 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 2rem;
         max-width: 1200px;
     }
