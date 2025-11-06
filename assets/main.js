@@ -142,7 +142,7 @@ function getClothingSuggestion(temp, weatherCode, rain = 0) {
 // ------------------------------------------------------
 // Hundetips (flere beskeder)
 // ------------------------------------------------------
-function getDogTips(temp, weatherCode, rain = 0, windSpeed = 0) {
+function getDogTips(temp, weatherCode, rain = 0) {
     const tips = [];
 
     if (temp >= 25) {
