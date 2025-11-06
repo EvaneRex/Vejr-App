@@ -192,7 +192,7 @@ function getDogTips(temp, weatherCode, rain = 0, windSpeed = 0) {
         });
     }
 
-    return tips;
+    return tips.slice(0, 2);
 }
 
 // ------------------------------------------------------
