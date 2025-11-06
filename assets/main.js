@@ -5,8 +5,6 @@
 const apiKey = "add43568d915b7b4e55a7c1f8b67d198";
 
 // ------------------------------------------------------
-// Cache DOM-elementer (hurtigere og mere effektivt)
-// ------------------------------------------------------
 // Globale DOM-elementer: Ingen gentagne lookups i hele scriptet
 const cityEl = document.getElementById("city");
 const tempEl = document.getElementById("temp");
@@ -393,10 +391,17 @@ function skipOnboarding() {
 function showApp() {
     onboardingEl.style.display = "none";
     appEl.style.display = "block";
-
+    // Tjekker, om browseren understøtter geolocation (GPS-funktion)
     if (navigator.geolocation) {
+
+        // Hvis geolocation er tilgængelig, hentes brugerens nuværende position
         navigator.geolocation.getCurrentPosition(
+
+            // Callback-funktion ved succes:
+            // Sender brugerens koordinater (latitude og longitude) videre til funktionen,
             pos => showWeatherData({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+
+            // Callback-funktion ved fejl:
             showError
         );
     }
