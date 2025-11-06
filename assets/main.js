@@ -178,13 +178,6 @@ function getDogTips(temp, weatherCode, rain = 0, windSpeed = 0) {
         });
     }
 
-    if (weatherCode.startsWith("50")) {
-        tips.push({
-            text: "Tåge - hold snoren kort",
-            icon: "./assets/img/fog.svg"
-        });
-    }
-
     if (tips.length === 0) {
         tips.push({
             text: "Perfekt vejr til en gåtur",
@@ -192,7 +185,7 @@ function getDogTips(temp, weatherCode, rain = 0, windSpeed = 0) {
         });
     }
 
-    return tips.slice(0, 2);
+    return tips;
 }
 
 // ------------------------------------------------------
